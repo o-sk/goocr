@@ -72,6 +72,11 @@ func (g *Goocr) Recognize(path string) (text string, err error) {
 		return "", err
 	}
 
+	text, err = g.read(driveFile)
+	if err != nil {
+		return "", err
+	}
+
 	err = g.delete(driveFile)
 	if err != nil {
 		return "", err
@@ -87,6 +92,21 @@ func (g *Goocr) upload(file *os.File) (driveFile *drive.File, err error) {
 		return nil, errors.Wrap(err, "Failed upload")
 	}
 	return driveFile, nil
+}
+
+func (g *Goocr) read(driveFile *drive.File) (string, error) {
+	res, err := g.Service.Files.Export(
+		driveFile.Id,
+		"text/plain",
+	).Download()
+	if err != nil {
+		return "", err
+	}
+	result, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }
 
 func (g *Goocr) delete(driveFile *drive.File) (err error) {
