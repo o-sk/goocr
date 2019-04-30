@@ -52,7 +52,8 @@ func main() {
 		g.SetupClient()
 		text, err := g.Recognize(objectFilePath)
 		if err != nil {
-			log.Fatal("Can't recognize. %v", err)
+			log.Fatalf("Can't recognize. %v", err)
+			return nil
 		}
 		fmt.Printf("%s\n", text)
 		return nil
