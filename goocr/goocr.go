@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -53,7 +54,7 @@ func (g *Goocr) SetupClient() {
 func (g *Goocr) Recognize(path string) (text string, err error) {
 	_, err = os.Open(path)
 	if err != nil {
-		log.Fatalf("Can't open %s. err: %v", path, err)
+		return "", errors.Wrapf(err, "Can't open %s.", path)
 	}
 	return text, err
 }
