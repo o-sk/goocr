@@ -44,7 +44,7 @@ func (g *Goocr) SetupClient() {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
-	config, err := google.ConfigFromJSON(b, drive.DriveMetadataScope)
+	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
@@ -52,11 +52,44 @@ func (g *Goocr) SetupClient() {
 }
 
 func (g *Goocr) Recognize(path string) (text string, err error) {
-	_, err = os.Open(path)
+	uploadFile, err := os.Open(path)
 	if err != nil {
 		return "", errors.Wrapf(err, "Can't open %s.", path)
 	}
+
+	service, err := drive.New(g.Client)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed new drive service.")
+	}
+
+	driveFile, err := g.upload(service, uploadFile)
+	if err != nil {
+		return "", err
+	}
+
+	err = g.delete(service, driveFile)
+	if err != nil {
+		return "", err
+	}
+
 	return text, err
+}
+
+func (g *Goocr) upload(service *drive.Service, file *os.File) (driveFile *drive.File, err error) {
+	f := &drive.File{Name: file.Name()}
+	driveFile, err = service.Files.Create(f).Media(file).Do()
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed upload")
+	}
+	return driveFile, nil
+}
+
+func (g *Goocr) delete(service *drive.Service, driveFile *drive.File) (err error) {
+	err = service.Files.Delete(driveFile.Id).Do()
+	if err != nil {
+		return errors.Wrap(err, "Failed delete")
+	}
+	return nil
 }
 
 func (g *Goocr) getClient(config *oauth2.Config) *http.Client {
