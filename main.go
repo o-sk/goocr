@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"ost"
+	"os"
 
 	"github.com/o-sk/goocr/goocr"
 	"github.com/urfave/cli"
@@ -49,6 +50,11 @@ func main() {
 		}
 		g := goocr.NewGoocr(goocr.NewConfig(credentialsFilePath, tokenFilePath))
 		g.SetupClient()
+		text, err := g.Recognize(objectFilePath)
+		if err != nil {
+			log.Fatal("Can't recognize. %v", err)
+		}
+		fmt.Printf("%s\n", text)
 		return nil
 	}
 	app.Run(os.Args)

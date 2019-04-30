@@ -50,6 +50,14 @@ func (g *Goocr) SetupClient() {
 	g.Client = g.getClient(config)
 }
 
+func (g *Goocr) Recognize(path string) (text string, err error) {
+	_, err = os.Open(path)
+	if err != nil {
+		log.Fatalf("Can't open %s. err: %v", path, err)
+	}
+	return text, err
+}
+
 func (g *Goocr) getClient(config *oauth2.Config) *http.Client {
 	tok, err := g.tokenFromFile(g.config.tokenFilePath)
 	if err != nil {
