@@ -1,9 +1,12 @@
 package goocr
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -44,14 +47,14 @@ func (g *Goocr) SetupClient() {
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	g.Client := g.getClient(config)
+	g.Client = g.getClient(config)
 }
 
 func (g *Goocr) getClient(config *oauth2.Config) *http.Client {
 	tok, err := g.tokenFromFile(g.config.tokenFilePath)
 	if err != nil {
 		tok = g.getTokenFromWeb(config)
-		g.saveToken(tokFile, tok)
+		g.saveToken(g.config.tokenFilePath, tok)
 	}
 	return config.Client(context.Background(), tok)
 }
