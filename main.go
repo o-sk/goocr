@@ -49,7 +49,11 @@ func main() {
 			return nil
 		}
 		g := goocr.NewGoocr(goocr.NewConfig(credentialsFilePath, tokenFilePath))
-		g.SetupClient()
+		err := g.SetupClient()
+		if err != nil {
+			log.Fatalf("Can't setup client. %v", err)
+			return nil
+		}
 		text, err := g.Recognize(objectFilePath)
 		if err != nil {
 			log.Fatalf("Can't recognize. %v", err)
