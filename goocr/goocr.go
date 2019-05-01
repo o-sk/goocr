@@ -86,7 +86,7 @@ func (g *Goocr) Recognize(path string) (text string, err error) {
 }
 
 func (g *Goocr) upload(file *os.File) (driveFile *drive.File, err error) {
-	f := &drive.File{Name: file.Name()}
+	f := &drive.File{Name: file.Name(), MimeType: "application/vnd.google-apps.document"}
 	driveFile, err = g.Service.Files.Create(f).Media(file).Do()
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed upload")
