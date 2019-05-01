@@ -95,10 +95,7 @@ func (g *Goocr) upload(file *os.File) (driveFile *drive.File, err error) {
 }
 
 func (g *Goocr) read(driveFile *drive.File) (string, error) {
-	res, err := g.Service.Files.Export(
-		driveFile.Id,
-		"text/plain",
-	).Download()
+	res, err := g.Service.Files.Export(driveFile.Id, "text/plain").Download()
 	if err != nil {
 		return "", err
 	}
